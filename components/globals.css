@@ -11,14 +11,14 @@
   tr {
     @apply py-1 bg-teal-300 whitespace-nowrap text-xs text-gray-900;
   }
-
+  
   td {
     @apply py-1 text-xs text-gray-900;
   }
 }
 
 :root {
-  --background: rgb(153, 246, 228);
+  --background: rgb(13, 148, 136);
   --foreground: rgb(255,255,255);
 }
 
