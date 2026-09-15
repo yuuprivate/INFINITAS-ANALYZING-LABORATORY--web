@@ -7,14 +7,12 @@ export type RecordItem = {
   song_id: number;
   song_name?: string;
   title?: string;
-  difficulty?: string;
-  difficulty_type?: string;
+  difficulty_name?: string;
   level: number;
   version: number;
   clear_state?: string | number;
   score?: number;
   ex_score?: number;
-  bp?: number;
 };
 
 const CLEAR_MAP: Record<number, string> = {
@@ -88,6 +86,8 @@ export default function SongRecordTable({
         p1: param1,
         p2: param2,
       });
+
+      console.log("Request URL:", `${baseUrl}?${params.toString()}`);
 
       fetch(`${baseUrl}?${params.toString()}`)
         .then((res) => res.json())
@@ -275,11 +275,7 @@ export default function SongRecordTable({
                 <th>Title</th>
                 <th>Difficult</th>
                 <th>Version</th>
-                {userId && (<>
-                    <th>Clear</th>
-                    <th>Score</th>
-                    <th>BP</th> </>
-                )}
+                {userId && <><th>Clear</th><th>Score</th></>}
               </tr>
             </thead>
             <tbody>
@@ -287,13 +283,12 @@ export default function SongRecordTable({
                 <tr key={index}>
                   <td>☆{rec.level}</td>
                   <td>{rec.song_name || rec.title}</td>
-                  <td>{rec.difficulty || rec.difficulty_type}</td>
+                  <td>{rec.difficulty_name || rec.difficulty_name}</td>
                   <td>{rec.version}</td>
                   {userId && (
                     <>
                       <td>{rec.clear_state !== undefined && rec.clear_state !== null ? CLEAR_MAP[Number(rec.clear_state)] ?? rec.clear_state : "-"}</td>
                       <td>{rec.ex_score ?? rec.score ?? "-"}</td>
-                      <td>{rec.bp ?? "-"}</td>
                     </>
                   )}
                 </tr>

@@ -14,8 +14,8 @@ type User = {
   ability_score_dp?: number;
 };
 
-// ソート可能なキーに動的アビリティ項目も含める
-type SortKey = "user_id" | "dj_name" | "clear" | "score";
+// ソート可能なキーに "rank" も含める
+type SortKey = "rank" | "user_id" | "dj_name" | "clear" | "score";
 
 export default function User() {
   const [users, setUsers] = useState<User[]>([]);
@@ -55,7 +55,8 @@ export default function User() {
   };
 
   // ユーザーオブジェクトからソート対象の値を取り出すヘルパー
-  const getSortValue = (user: User, key: SortKey) => {
+  const getSortValue = (user: User, key: SortKey, computedRank?: number) => {
+    if (key === "rank") return computedRank ?? 0;
     if (key === "clear") {
       return playStyle === "SP" ? user.ability_clear_sp : user.ability_clear_dp;
     }
@@ -65,9 +66,13 @@ export default function User() {
     return user[key as keyof User];
   };
 
+  // まず通常通りソート
   const sortedUsers = [...users].sort((a, b) => {
-    const aVal = getSortValue(a, sortKey);
-    const bVal = getSortValue(b, sortKey);
+    // rank自体でソートする場合は一旦他のキー（例: user_id）でソートするかそのままにする等の対応が必要ですが、
+    // ここでは通常のソート結果に対して後から順位を付与します
+    const sortField = sortKey === "rank" ? "user_id" : sortKey;
+    const aVal = getSortValue(a, sortField);
+    const bVal = getSortValue(b, sortField);
 
     if (aVal === undefined || aVal === null) return 1;
     if (bVal === undefined || bVal === null) return -1;
@@ -126,35 +131,41 @@ export default function User() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-teal-400">
                 <tr>
-                  <th onClick={() => handleSort("user_id")}>
-                    ID {renderSortIndicator("user_id")}
+                  <th>
+                    Rank
                   </th>
                   <th onClick={() => handleSort("dj_name")}>
                     DJ NAME {renderSortIndicator("dj_name")}
                   </th>
+                  <th onClick={() => handleSort("user_id")}>
+                    ID {renderSortIndicator("user_id")}
+                  </th>
                   <th onClick={() => handleSort("clear")}>
-                    {playStyle} Clear ability {renderSortIndicator("clear")}
+                    {playStyle} Clear {renderSortIndicator("clear")}
                   </th>
                   <th onClick={() => handleSort("score")}>
-                    {playStyle} Score ability {renderSortIndicator("score")}
+                    {playStyle} Score {renderSortIndicator("score")}
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-teal-300 divide-y divide-gray-200">
-                {sortedUsers.map((user) => (
+                {sortedUsers.map((user, index) => (
                   <tr key={user.user_id} className="hover:bg-teal-200 transition">
-                    <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {user.user_id}
+                    <td>
+                      {index + 1}
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
-                      <Link href={`/user/${user.user_id}`} className="text-blue-600 hover:underline">
+                    <td>
+                      <Link href={`/user/${user.user_id}/all`} className="text-blue-600 hover:underline">
                         {user.dj_name}
                       </Link>
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700">
+                    <td>
+                      {user.user_id}
+                    </td>
+                    <td>
                       {playStyle === "SP" ? (user.ability_clear_sp ?? "-") : (user.ability_clear_dp ?? "-")}
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700">
+                    <td>
                       {playStyle === "SP" ? (user.ability_score_sp ?? "-") : (user.ability_score_dp ?? "-")}
                     </td>
                   </tr>

@@ -16,8 +16,9 @@ export default function LeftSidebar({
 
   const navItems = [
     { href: "/home", label: "Home" },
-    { href: "/user", label: "Player" },
-    { href: "/song", label: "Song" },
+    { href: "/user", label: "Players" },
+    { href: "/user/search", label: "Search Player" },
+    { href: "/song", label: "Songs" },
   ];
 
   return (
